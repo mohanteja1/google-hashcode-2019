@@ -1,5 +1,5 @@
 // PROBLEM:
-// AIM : given something find something.
+// AIM : FIND SOLUTION FOR PIZZA PROBLEM
 // CONSTRAINTS:
 /* TEST CASES:  INPUT   SOLUTION
         1            -->
@@ -7,15 +7,16 @@
  */
 
 /* ALGORITHM1:
-              1.READ INPUT AS STRING TO REDUCE THE MEMORY
-              2.
-              3.
-              4.
+              1.READ INPUT MATRIX AS STRING TO REDUCE THE MEMORY
+              2.FIND THE FACTORIAL KERNELS (EACH SIZE OF THE PIECE THAT CAN BE CUT DOWN)
+              3.APPLY THESE KERNELS OVER THE MATRIX( RASTER SCAN ) FIND OPTIMAL ONE
+              4.UPDATE COORDINATES OF SLICES (PRINT)
    */
-//COMPLEXITY:              MEMORY:
+//COMPLEXITY:  O(n^2)            MEMORY: 20 MB
+
+//SCORE: 9.35 LAKH IN GOOGLE JUDGE
 
 //BY MOHANTEJA
-
 
 #include <cassert>
 #include <cctype>
@@ -42,237 +43,188 @@
 #include <iterator>
 #include <numeric>
 #include <utility>
-#define DEBUG if(0)
-#define PAUSE system("pause")
-#define READ(f) freopen(f, "r", stdin)
-#define WRITE(f) freopen(f, "w", stdout)
-#define ALL(c) c.begin(), c.end()
-#define PB(x) push_back(x)
-#define UB(s, e, x) upper_bound(s, e, x)
-#define LB(s, e, x) lower_bound(s, e, x)
-#define REV(s, e) reverse(s, e);
-#define SZ(c) c.size()
-#define SET(p) memset(p, -1, sizeof(p))
-#define CLR(p) memset(p, 0, sizeof(p))
-#define MEM(p, v) memset(p, v, sizeof(p))
-#define i64 long long
-#define ff first
-#define ss second
-#define i64 long long
-#define FS "%lld"
-
-template< class T > T sq(T &x) { return x * x; }
-template< class T > T abs(T &n) { return (n < 0 ? -n : n); }
-template< class T > T max(T &a, T &b) { return (!(a < b) ? a : b); }
-template< class T > T min(T &a, T &b) { return (a < b ? a : b); }
-template< class T > T gcd(T a, T b) { return (b != 0 ? gcd<T>(b, a%b) : a); }
-template< class T > T lcm(T a, T b) { return (a / gcd<T>(a, b) * b); }
-template< class T > T mod(T &a, T &b) { return (a < b ? a : a % b); }
-template< class T > bool inside(T &a, T &b, T &c) { return a<=b && b<=c; }
-template< class T > void setmax(T &a, T b) { if(a < b) a = b; }
-template< class T > void setmin(T &a, T b) { if(b < a) a = b; }
-
-
-const int INF = 1000000001;
-const double EPS = 1e-10;
-const int MAX = 100001;
 
 using namespace std;
 
-vector<pair<int,int>>  kernelGenerator(int minSize,int maxSize){
- //returns kernels 
-  vector<pair<int ,int>> kernels;
+vector<pair<int, int>> kernelGenerator(int minSize, int maxSize)
+{   
+    //calculates all the factors for the number x ranging from minSize and MaxSize 
+    // kernels for number 6 --> (1x6) ,(2x3),(3x2),(6x1)
+    //returns kernels
+    vector<pair<int, int>> kernels;
 
- int temp;
- for(int i=minSize ; i<=maxSize ; i++)
- {
-     temp=1;
-     while (temp <= i)
+    int temp;
+    for (int i = minSize; i <= maxSize; i++) //calculates factors
     {
-        if (!( i % temp))
-            kernels.push_back(make_pair(temp,i/temp));
-        temp++;
+        temp = 1;
+        while (temp <= i)
+        {
+            if (!(i % temp))
+                kernels.push_back(make_pair(temp, i / temp));
+            temp++;
+        }
     }
- }
- // cout<< "kernels" <<endl;
-
-  //std::copy(kernels.begin(), kernels.end(), std::ostream_iterator<pair<int,int>>(std::cout, " "));
-  
-// for(int i=0;i<kernels.size();i++){
-//     cout<< kernels.at(i).first << " " << kernels.at(i).second<<endl;
-// }
-
-  return kernels;
+   
+    return kernels;
 }
 
-// vector<pair<int,int>> listBoundaryPoints(int topLeftX,int topLeftY,int bottomRightX,int bottomRightY,int rows,int cols){
-//     //lists boundary points
-// }
 
-bool isKernelOk(pair<int,int> coordinate,vector<string> *matrix,pair<int,int> kernel,vector<string>* flagMatrix,int minNoOfIngred){
-    int tomatoe=minNoOfIngred,mushroom=minNoOfIngred;
-    
-  
+ vector<pair<int,int>> listBoundaryPoints(int topLeftX,int topLeftY,int bottomRightX,int bottomRightY,int rows,int cols){
+   //lists boundary points of applied kernel
+      //implement code for optimization 
 
-    if(flagMatrix->at(coordinate.first).at(coordinate.second)=='x')
-       return false;
+      return {};
+ }
 
-    if(coordinate.first+kernel.first> matrix->size()||coordinate.second+kernel.second > matrix->at(0).length())
-       return false;
 
-    for(int i = coordinate.first;i<coordinate.first + kernel.first;i++){
-         for(int j=coordinate.second;j<coordinate.second+kernel.second;j++)
-                        {
-                            if(flagMatrix->at(i).at(j)=='0')
-                               return false;
 
-                            if(matrix->at(i).at(j)=='T')tomatoe--;
-                              else mushroom--;  
-                       
-                        }
+bool isKernelOk(pair<int, int> coordinate, vector<string> *matrix, pair<int, int> kernel, vector<string> *flagMatrix, int minNoOfIngred)
+{
+    //checks 
+    int tomatoe = minNoOfIngred, mushroom = minNoOfIngred;
+    if (flagMatrix->at(coordinate.first).at(coordinate.second) == 'x')
+        return false;
+    if (coordinate.first + kernel.first > matrix->size() || coordinate.second + kernel.second > matrix->at(0).length())
+        return false;
+    for (int i = coordinate.first; i < coordinate.first + kernel.first; i++)
+    {
+        for (int j = coordinate.second; j < coordinate.second + kernel.second; j++)
+        {
+            if (flagMatrix->at(i).at(j) == '0')
+                return false;
 
+            if (matrix->at(i).at(j) == 'T')
+                tomatoe--;
+            else
+                mushroom--;
+        }
     }
-  if(tomatoe<=0 && mushroom <=0) 
+    if (tomatoe <= 0 && mushroom <= 0)
         return true;
     else
         return false;
 }
 
-pair<int,int> findOptimalKernel(pair<int,int> coordinate,int minNoOfIngred,vector<pair<int,int>> kernels,vector<string>*matrix,vector<string>*flagMatrix){
-    
+pair<int, int> findOptimalKernel(pair<int, int> coordinate, int minNoOfIngred, vector<pair<int, int>> kernels, vector<string> *matrix, vector<string> *flagMatrix)
+{
 
-
-    for(int i=kernels.size()-1;i>=0;i--)
+    for (int i = kernels.size() - 1; i >= 0; i--)
     {
-        //optimise implement best kernel first if possible
-       if(isKernelOk(coordinate,matrix,kernels.at(i),flagMatrix,minNoOfIngred))
+        //optimise implement best kernel first if possible here
+        if (isKernelOk(coordinate, matrix, kernels.at(i), flagMatrix, minNoOfIngred))
             return kernels.at(i);
-        
-    
     }
 
-    flagMatrix->at(coordinate.first).at(coordinate.second)='x';
+    flagMatrix->at(coordinate.first).at(coordinate.second) = 'x';
 
-
-return make_pair(-1,-1) ;
+    return make_pair(-1, -1);
 }
 
-void markZeros(vector<string> *flagMatrix,pair<int,int> coordinate,pair<int,int> kernel){
-   //updates flagmatrix 
+void markZeros(vector<string> *flagMatrix, pair<int, int> coordinate, pair<int, int> kernel)
+{
+    //updates flagmatrix
 
-    if(flagMatrix->at(coordinate.first).at(coordinate.second)=='x')
-       return ;
+    if (flagMatrix->at(coordinate.first).at(coordinate.second) == 'x')
+        return;
 
-   if(coordinate.first+kernel.first> flagMatrix->size()||coordinate.second+kernel.second > flagMatrix->at(0).length())
-       return ;
+    if (coordinate.first + kernel.first > flagMatrix->size() || coordinate.second + kernel.second > flagMatrix->at(0).length())
+        return;
 
-   for(int i = coordinate.first;i<coordinate.first + kernel.first;i++)
-         for(int j=coordinate.second;j<coordinate.second+kernel.second;j++)
-                        flagMatrix->at(i).at(j)='0';
+    for (int i = coordinate.first; i < coordinate.first + kernel.first; i++)
+        for (int j = coordinate.second; j < coordinate.second + kernel.second; j++)
+            flagMatrix->at(i).at(j) = '0';
 
-  return;
-
+    return;
 }
 
+vector<pair<pair<int, int>, pair<int, int>>> pizzaSlicer(vector<string> *matrix, vector<string> *flagmatrix, int rows, int cols, int minNoOfIngred, int maxSize)
+{
 
-vector<pair<pair<int,int>,pair<int,int>>> pizzaSlicer(vector<string> *matrix,vector<string> *flagmatrix,int rows,int cols,int minNoOfIngred,int maxSize)
-{ 
-    
+    //generate kernels: all the possible rectangular slices that fit given constraints
+    vector<pair<int, int>> kernels;
+    kernels = kernelGenerator(minNoOfIngred * 2, maxSize);
 
-
-    //all the kernels required
-    vector<pair<int ,int>> kernels ;
-    kernels = kernelGenerator(minNoOfIngred*2,maxSize);
-    
     //list of coordinate to be sent
-     vector<pair<pair<int,int>,pair<int,int>>> coordinates ;
-     
-     pair<int ,int > optimalCoordinate,optimalKernel;
+    vector<pair<pair<int, int>, pair<int, int>>> coordinates;
 
-     vector<pair<int,int>> boundaryCoordinates;
-     boundaryCoordinates.push_back(make_pair(0,0));
-    
-    //apply the kernels on each boundary points
-
-      for(int i=0;i<rows;i++){
-         {  
-           //  printf("ps\n");
-              for(int j=0; j<cols; )
-              {
-
-                  if(flagmatrix->at(i).at(j)== '1')
-                   { 
-                      
-
-                       optimalKernel=findOptimalKernel(make_pair(i,j),minNoOfIngred,kernels,matrix,flagmatrix);
-                       
-                       if(optimalKernel.first!=-1)
-                          {
-                                                  
-
-                              markZeros(flagmatrix,make_pair(i,j),optimalKernel);
-                              coordinates.push_back(make_pair(make_pair(i,j),make_pair(i+optimalKernel.first-1,j+optimalKernel.second-1)));
-                              j=j+optimalKernel.second-1;
-                              
-                          }
-                        else{
-                            j++;
-                        }
-                         
-                   }
-                   else
-                      j++;
+    pair<int, int> optimalCoordinate, optimalKernel;
          
-              }            
-            
-                  
-         }            
-         
-      }
+    vector<pair<int, int>> boundaryCoordinates;
+    boundaryCoordinates.push_back(make_pair(0, 0));
 
-    //
 
-    return coordinates ;
+    //apply the kernels row wise checking flag matrix
+
+    for (int i = 0; i < rows; i++)
+    {
+            for (int j = 0; j < cols;)
+            {
+                if (flagmatrix->at(i).at(j) == '1') //piece is available
+                {
+                     //find best slice that can be applied on that point
+                    optimalKernel = findOptimalKernel(make_pair(i, j), minNoOfIngred, kernels, matrix, flagmatrix);
+                    
+                    if (optimalKernel.first != -1) //if atleast a kernel can be applied
+                    {
+                       //mark zeros in flag matrix indicating pieces are cut
+                        markZeros(flagmatrix, make_pair(i, j), optimalKernel);
+                       // push the coordinates of that slice
+                        coordinates.push_back(make_pair(make_pair(i, j), make_pair(i + optimalKernel.first - 1, j + optimalKernel.second - 1)));
+                        j = j + optimalKernel.second - 1;
+                    }
+                    else  //else iterate for next slice 
+                    {           
+                        j++;
+                    }
+                }
+                else  //else increament next slice in row 
+                    j++;
+            }
+    }
+
+    return coordinates;
 }
-
 
 int main()
 {
-
-	// your code here
     
-    int rows,cols,min,maxSize;
 
-	cin >> rows;
+    int rows, cols, min, maxSize;
+
+    cin >> rows;
     cin >> cols;
-	cin >> min;
-	cin >> maxSize;
-     
-    vector<string> matrix(rows); 
-    vector<string> flagMatrix(rows);
-    string flagMatrixline(cols,'1'); 
+    cin >> min;
+    cin >> maxSize;
 
-    int i=0;
+    vector<string> matrix(rows); //matrix for pizza
 
-	while (i<rows)
-	{
-		cin >> matrix.at(i);
+    vector<string> flagMatrix(rows); //matrix for marking cutted pizza slices 
+    string flagMatrixline(cols, '1');
+
+    int i = 0;
+
+    while (i < rows)
+    {
+        cin >> matrix.at(i);
         flagMatrix.at(i).append(flagMatrixline);
         i++;
-	}
+    }
+    //output type defination : coordinates of topleft and bottom right points of each pizza slice cutted
+    vector<pair<pair<int, int>, pair<int, int>>> coordinates;
 
-    vector<pair<pair<int,int>,pair<int,int>>> coordinates ;
-    coordinates = pizzaSlicer(&matrix,&flagMatrix,rows,cols,min,maxSize);
-    
-    cout<<coordinates.size()<<endl;
-    for(int i=0;i<coordinates.size();i++ )
+     //call the pizza slicer
+    coordinates = pizzaSlicer(&matrix, &flagMatrix, rows, cols, min, maxSize);
+
+
+     //print the slices 
+
+    cout << coordinates.size() << endl;
+    for (int i = 0; i < coordinates.size(); i++)
     {
-        cout << coordinates.at(i).first.first << " " << coordinates.at(i).first.second << " " << coordinates.at(i).second.first << " " <<coordinates.at(i).second.second << endl;
+        cout << coordinates.at(i).first.first << " " << coordinates.at(i).first.second << " " << coordinates.at(i).second.first << " " << coordinates.at(i).second.second << endl;
     }
 
+    // std::copy((*coordinates).begin(),(*coordinates).end(), std::ostream_iterator<pair<pair<int,int>,pair<int,int>>>(std::cout, " "));
 
-   // std::copy((*coordinates).begin(),(*coordinates).end(), std::ostream_iterator<pair<pair<int,int>,pair<int,int>>>(std::cout, " "));
-
-
-	return 0;
+    return 0;
 }
